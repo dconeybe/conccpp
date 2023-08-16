@@ -9,4 +9,5 @@ set(CMAKE_CXX_EXTENSIONS NO)
 include(CTest)
 include(cmake/SetupCompilerWarnings.cmake)
 
+add_subdirectory(third_party)
 add_subdirectory(queue)
