@@ -82,14 +82,14 @@ jobs:
       - run: cmake --version
 
       - if: runner.os == 'Linux'
-        run: cmake -S . -B build --log-context -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_config }}
+        run: cmake -S . -B build --log-context -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_config }} -DCONCPP_LOG_CMAKE_INFO=YES
         env:
           CC: ${{ matrix.compiler == 'clang' && 'clang' || 'gcc' }}
           CXX: ${{ matrix.compiler == 'clang' && 'clang++' || 'g++' }}
       - if: runner.os == 'macOS'
-        run: cmake -S . -B build --log-context -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_config }}
+        run: cmake -S . -B build --log-context -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_config }} -DCONCPP_LOG_CMAKE_INFO=YES
       - if: runner.os == 'Windows'
-        run: cmake -S . -B build --log-context -G "Visual Studio 17 2022"
+        run: cmake -S . -B build --log-context -G "Visual Studio 17 2022" -DCONCPP_LOG_CMAKE_INFO=YES
 
       - if: runner.os != 'Windows'
         run: cmake --build build
