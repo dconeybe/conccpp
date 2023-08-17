@@ -1,0 +1,17 @@
+on:
+  push:
+    branches: ['**']
+
+jobs:
+
+  ctest:
+    strategy:
+      fail-fast: false
+      matrix:
+        runs_on: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+
+    runs-on: ${{ matrix.runs_on }}
+    steps:
+    - uses: actions/checkout@v3
+    - run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+    - run: cmake --build build
