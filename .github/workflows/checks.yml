@@ -6,6 +6,18 @@ on:
 
 jobs:
 
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10' 
+      - run: pip install pyink
+
+      - uses: actions/checkout@v3
+
+      - run: ./scripts/format.sh -c
+
   ctest:
     strategy:
       fail-fast: false
@@ -54,15 +66,3 @@ jobs:
       - name: cmake build
         if: runner.os == 'Windows'
         run: cmake --build build --config ${{ matrix.build_config }}
-
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-python@v4
-          with:
-          python-version: '3.10' 
-      - run: pip install pyink
-
-      - uses: actions/checkout@v3
-
-      - run: ./scripts/format.sh -c
