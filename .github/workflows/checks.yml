@@ -1,3 +1,5 @@
+name: checks
+
 on:
   push:
     branches: ['**']
@@ -9,6 +11,7 @@ jobs:
       fail-fast: false
       matrix:
         runs_on: ['ubuntu-latest', 'windows-latest', 'macos-latest']
+        build_config: ['Debug', 'Release']
 
     runs-on: ${{ matrix.runs_on }}
     steps:
@@ -16,7 +19,15 @@ jobs:
         run: sudo apt-get install -y ninja-build
       - if: runner.os == 'macOS'
         run: brew install ninja
+
       - uses: actions/checkout@v3
-      - run: cmake --help
-      - run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Debug
+
+      - if: runner.os != 'Windows'
+      - run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=${{ matrix.build_config }}
+      - if: runner.os == 'Windows'
+      - run: cmake -S . -B build -G "Visual Studio 17 2022"
+
+      - if: runner.os != 'Windows'
       - run: cmake --build build
+      - if: runner.os == 'Windows'
+      - run: cmake --build build --config ${{ matrix.build_config }}
