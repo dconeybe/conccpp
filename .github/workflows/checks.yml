@@ -54,3 +54,9 @@ jobs:
       - name: cmake build
         if: runner.os == 'Windows'
         run: cmake --build build --config ${{ matrix.build_config }}
+
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: ./scripts/format.sh -c
