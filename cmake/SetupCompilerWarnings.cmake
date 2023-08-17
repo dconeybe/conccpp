@@ -85,7 +85,6 @@ elseif(warning_flags_id STREQUAL "warning_flags_msvc")
     /w14555
     /w14619
     /w14640
-    /w14640
     /w14826
     /w14905
     /w14906
