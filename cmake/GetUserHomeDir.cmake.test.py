@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import   dataclasses
+import dataclasses
 import os
 import pathlib
 import platform
