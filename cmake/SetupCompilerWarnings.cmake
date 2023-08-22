@@ -1,6 +1,6 @@
-include(CheckCXXCompilerFlag)
-
 block()
+
+include(CheckCXXCompilerFlag)
 
 list(APPEND CMAKE_MESSAGE_CONTEXT "SetupCompilerWarnings")
 
