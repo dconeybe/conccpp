@@ -158,6 +158,9 @@ if(do_download_and_extract)
   file(WRITE "${stamp_file}" "${expected_stamp_file_contents}")
 endif()
 
+# Set some variables to influence how googletest works.
+set(INSTALL_GTEST OFF)
+
 add_subdirectory(
   "${googletest_source_dir}"
   "${googletest_binary_dir}"
