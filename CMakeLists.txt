@@ -12,7 +12,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED YES)
 set(CMAKE_CXX_EXTENSIONS NO)
 
 include(CTest)
-include(cmake/SetupCompilerWarnings.cmake)
 
 add_subdirectory(third_party)
-add_subdirectory(queue)
+
+# Add compiler warning flags _after_ including `third_party` so that we don't get spurious
+# warnings from third-party code.
+include(cmake/SetupCompilerWarnings.cmake)
+
+add_subdirectory(stack)

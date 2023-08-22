@@ -125,6 +125,6 @@ endforeach()
 # Set the supported warnings.
 string(JOIN ", " supported_warning_flags_str ${supported_warning_flags})
 message(VERBOSE "Setting compiler warning flags: ${supported_warning_flags_str}")
-add_compile_options(${supported_warning_flags_str})
+add_compile_options(${supported_warning_flags})
 
 endblock()
