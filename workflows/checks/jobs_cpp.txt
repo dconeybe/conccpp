@@ -1,37 +1,30 @@
-  cpp-test:
-    strategy:
-      fail-fast: false
-      matrix:
-        runs_on: ['ubuntu-latest', 'macos-latest', 'windows-latest']
-        build_config: ['Debug', 'Release']
-        compiler: ['gcc', 'clang', 'msvc']
-        target_architecture: ['Win32', 'x64']
-        exclude:
-          - runs_on: ubuntu-latest
-            compiler: msvc
-          - runs_on: ubuntu-latest
-            target_architecture: Win32
-          - runs_on: macos-latest
-            compiler: msvc
-          - runs_on: macos-latest
-            compiler: gcc
-          - runs_on: macos-latest
-            target_architecture: Win32
-          - runs_on: windows-latest
-            compiler: gcc
-          - runs_on: windows-latest
-            compiler: clang
-
-    runs-on: ${{ matrix.runs_on }}
+{% for params in cpp_tests %}
+  cpp-test-{$ params.os_name | lower $}-{$ params.build_config | lower $}{% if params.compiler %}-{$ params.compiler | lower $}{% endif %}{% if params.target_architecture %}-{$ params.target_architecture | lower $}{% endif %}:
+    runs-on: {$ params.github_runs_on $}
     steps:
-      - if: runner.os == 'Linux'
-        run: sudo apt-get install -y ninja-build
-      - if: runner.os == 'macOS'
-        run: brew install ninja
-
-      - uses: actions/checkout@v3
+      {% if params.os_name == 'linux' -%}
+      - run: sudo apt-get install -y ninja-build
+      {%- elif params.os_name == 'macos' -%}
+      - run: brew install ninja
+      {%- endif %}
       - run: cmake --version
+      - uses: actions/checkout@v3
+      {% if params.os_name == 'linux' or params.os_name == 'macos' -%}
+      - run: cmake -S . -B build -DCMAKE_BUILD_TYPE={$ params.build_config $} -G Ninja -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
+      {%- if params.compiler %}
+        env:
+          CC: {% if params.compiler == "clang" %}clang{% elif params.compiler == "gcc" %}gcc{% endif %}
+          CXX: {% if params.compiler == "clang" %}clang++{% elif params.compiler == "gcc" %}g++{% endif %}
+      {%- endif %}
+      {%- elif params.os_name == 'windows' -%}
+      - run: cmake -S . -B build -G "Visual Studio 17 2022" -A {$ params.target_architecture $} -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
+      {%- endif %}
+{% endfor %}
 
+
+
+  cpp-test:
+    steps:
       - if: runner.os == 'Linux'
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_config }} -G Ninja -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
         env:
