@@ -1,0 +1,54 @@
+  format:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install pyink
+
+      - uses: actions/checkout@v3
+
+      - run: ./scripts/format.sh -c
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install pyflakes
+
+      - uses: actions/checkout@v3
+
+      - run: ./scripts/lint.sh
+
+  generated_checks_yml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install Jinja2
+
+      - uses: actions/checkout@v3
+
+      - run: python workflows/checks/generate.py >.github/workflows/checks.yml
+      - run: git diff --exit-code
+
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        runs_on: ['ubuntu-latest', 'macos-latest', 'windows-latest']
+
+    runs-on: ${{ matrix.runs_on }}
+    steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install absl-py
+
+      - uses: actions/checkout@v3
+
+      - run: ./scripts/test.sh
+        shell: bash
