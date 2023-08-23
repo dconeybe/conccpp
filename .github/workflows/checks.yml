@@ -23,7 +23,7 @@ concurrency:
 
 jobs:
 
-  format:
+  python-format:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-python@v4
@@ -35,7 +35,7 @@ jobs:
 
       - run: ./scripts/format.sh -c
 
-  lint:
+  python-lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/setup-python@v4
@@ -47,20 +47,7 @@ jobs:
 
       - run: ./scripts/lint.sh
 
-  generated_checks_yml:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      - run: pip install absl-py Jinja2
-
-      - uses: actions/checkout@v3
-
-      - run: python workflows/checks/generate.py >.github/workflows/checks.yml
-      - run: git diff --exit-code
-
-  test:
+  python-test:
     strategy:
       fail-fast: false
       matrix:
@@ -78,7 +65,20 @@ jobs:
       - run: ./scripts/test.sh
         shell: bash
 
-  ctest:
+  generated_checks_yml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install absl-py Jinja2
+
+      - uses: actions/checkout@v3
+
+      - run: python workflows/checks/generate.py >.github/workflows/checks.yml
+      - run: git diff --exit-code
+
+  cpp-test:
     strategy:
       fail-fast: false
       matrix:

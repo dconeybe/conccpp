@@ -1,4 +1,4 @@
-  ctest:
+  cpp-test:
     strategy:
       fail-fast: false
       matrix:

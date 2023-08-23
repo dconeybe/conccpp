@@ -25,4 +25,6 @@ jobs:
 
 {% include "jobs_python.txt" %}
 
+{% include "jobs_generated.txt" %}
+
 {% include "jobs_cpp.txt" %}
