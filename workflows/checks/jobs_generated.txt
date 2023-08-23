@@ -1,0 +1,12 @@
+  generated_checks_yml:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install absl-py Jinja2
+
+      - uses: actions/checkout@v3
+
+      - run: python workflows/checks/generate.py >.github/workflows/checks.yml
+      - run: git diff --exit-code
