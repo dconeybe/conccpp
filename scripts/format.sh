@@ -50,6 +50,7 @@ function run_pyink {
     --pyink
     --pyink-indentation 2
     cmake/*.py
+    workflows/checks/*.py
   )
 
   if [[ $ARG_CHECK_ONLY == '1' ]] ; then
