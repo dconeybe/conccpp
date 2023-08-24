@@ -93,6 +93,10 @@
   {%- endif -%}
 {%- endmacro -%}
 
+{%- macro common_cmake_configure_flags() -%}
+-DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
+{%- endmacro -%}
+
 {% for params in cpp_tests %}
 
   {%+ filter lower -%}
@@ -111,14 +115,14 @@
       {% endif %}
       - uses: actions/checkout@v3
       {% if params.operating_system == OperatingSystem.LINUX or params.operating_system == OperatingSystem.MACOS %}
-      - run: cmake -S . -B build -DCMAKE_BUILD_TYPE={$ cmake_build_type_for_build_config(params.build_config) $} -G Ninja -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
+      - run: cmake -S . -B build -DCMAKE_BUILD_TYPE={$ cmake_build_type_for_build_config(params.build_config) $} -G Ninja {$ common_cmake_configure_flags() $}
       {% if params.compiler %}
         env:
           CC: {$ c_compiler_command_for_compiler(params.compiler) $}
           CXX: {$ cpp_compiler_command_for_compiler(params.compiler) $}
       {% endif %}
       {% elif params.operating_system == OperatingSystem.WINDOWS %}
-      - run: cmake -S . -B build -G "Visual Studio 17 2022" -A {$ params.target_architecture $} -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
+      - run: cmake -S . -B build -G "Visual Studio 17 2022" -A {$ params.target_architecture $} {$ common_cmake_configure_flags() $}
       {% endif %}
       {% if params.operating_system == OperatingSystem.LINUX or params.operating_system == OperatingSystem.MACOS %}
       - run: cmake --build build
