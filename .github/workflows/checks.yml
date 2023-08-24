@@ -78,7 +78,6 @@ jobs:
       - run: python workflows/checks/generate.py >.github/workflows/checks.yml
       - run: git diff --exit-code
 
-
   cpp-test-linux-debug-gcc:
     runs-on: ubuntu-latest
     steps:
@@ -142,7 +141,6 @@ jobs:
   cpp-test-windows-debug-win32:
     runs-on: windows-latest
     steps:
-      
       - run: cmake --version
       - uses: actions/checkout@v3
       - run: cmake -S . -B build -G "Visual Studio 17 2022" -A Win32 -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
@@ -150,7 +148,6 @@ jobs:
   cpp-test-windows-release-win32:
     runs-on: windows-latest
     steps:
-      
       - run: cmake --version
       - uses: actions/checkout@v3
       - run: cmake -S . -B build -G "Visual Studio 17 2022" -A Win32 -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
@@ -158,7 +155,6 @@ jobs:
   cpp-test-windows-debug-x64:
     runs-on: windows-latest
     steps:
-      
       - run: cmake --version
       - uses: actions/checkout@v3
       - run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
@@ -166,11 +162,9 @@ jobs:
   cpp-test-windows-release-x64:
     runs-on: windows-latest
     steps:
-      
       - run: cmake --version
       - uses: actions/checkout@v3
       - run: cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
-
 
 
 

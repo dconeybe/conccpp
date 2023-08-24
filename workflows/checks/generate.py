@@ -16,6 +16,8 @@ def main(argv: list[str]) -> None:
       variable_start_string="{$",
       variable_end_string="$}",
       autoescape=False,
+      lstrip_blocks=True,
+      trim_blocks=True,
       loader=jinja2.FileSystemLoader(template_dir),
   )
 

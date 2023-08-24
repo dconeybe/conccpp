@@ -1,4 +1,4 @@
-{%- set cpp_tests = [
+{% set cpp_tests = [
   CppTestParameters(
     operating_system=OperatingSystem.LINUX,
     build_config=BuildConfig.DEBUG,
@@ -49,14 +49,14 @@
   ),
 ] -%}
 
-{% macro cmake_build_type_for_build_config(build_config) -%}
+{%- macro cmake_build_type_for_build_config(build_config) -%}
   {%- if build_config == BuildConfig.RELEASE -%}Release
   {%- elif build_config == BuildConfig.DEBUG -%}Debug
   {%- else -%}ERROR: unknown build_config: {$ build_config $}
   {%- endif -%}
 {%- endmacro -%}
 
-{% macro name_for_operating_system(operating_system) -%}
+{%- macro name_for_operating_system(operating_system) -%}
   {%- if operating_system == OperatingSystem.LINUX -%}linux
   {%- elif operating_system == OperatingSystem.MACOS -%}macos
   {%- elif operating_system == OperatingSystem.WINDOWS -%}windows
@@ -64,7 +64,7 @@
   {%- endif -%}
 {%- endmacro -%}
 
-{% macro github_runner_for_operating_system(operating_system) -%}
+{% macro github_runner_for_operating_system(operating_system) %}
   {%- if operating_system == OperatingSystem.LINUX -%}ubuntu-latest
   {%- elif operating_system == OperatingSystem.MACOS -%}macos-latest
   {%- elif operating_system == OperatingSystem.WINDOWS -%}windows-latest
@@ -72,14 +72,14 @@
   {%- endif -%}
 {%- endmacro -%}
 
-{% macro name_for_compiler(compiler) -%}
+{% macro name_for_compiler(compiler) %}
   {%- if compiler == Compiler.GCC -%}gcc
   {%- elif compiler == Compiler.CLANG -%}clang
   {%- else -%}ERROR: unknown compiler: {$ compiler $}
   {%- endif -%}
 {%- endmacro -%}
 
-{% macro c_compiler_command_for_compiler(compiler) -%}
+{% macro c_compiler_command_for_compiler(compiler) %}
   {%- if compiler == Compiler.GCC -%}gcc
   {%- elif compiler == Compiler.CLANG -%}clang
   {%- else -%}ERROR: unknown compiler: {$ compiler $}
@@ -94,7 +94,8 @@
 {%- endmacro -%}
 
 {% for params in cpp_tests %}
-  {% filter lower -%}
+
+  {%+ filter lower -%}
     cpp-test-
     {$- name_for_operating_system(params.operating_system) -$}-
     {$- cmake_build_type_for_build_config(params.build_config) -$}
@@ -103,23 +104,23 @@
   {%- endfilter %}:
     runs-on: {$ github_runner_for_operating_system(params.operating_system) $}
     steps:
-      {% if params.operating_system == OperatingSystem.LINUX -%}
+      {% if params.operating_system == OperatingSystem.LINUX %}
       - run: sudo apt-get install -y ninja-build
-      {%- elif params.operating_system == OperatingSystem.MACOS -%}
+      {% elif params.operating_system == OperatingSystem.MACOS %}
       - run: brew install ninja
-      {%- endif %}
+      {% endif %}
       - run: cmake --version
       - uses: actions/checkout@v3
-      {% if params.operating_system == OperatingSystem.LINUX or params.operating_system == OperatingSystem.MACOS -%}
+      {% if params.operating_system == OperatingSystem.LINUX or params.operating_system == OperatingSystem.MACOS %}
       - run: cmake -S . -B build -DCMAKE_BUILD_TYPE={$ cmake_build_type_for_build_config(params.build_config) $} -G Ninja -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
-      {%- if params.compiler %}
+      {% if params.compiler %}
         env:
           CC: {$ c_compiler_command_for_compiler(params.compiler) $}
           CXX: {$ cpp_compiler_command_for_compiler(params.compiler) $}
-      {%- endif %}
-      {%- elif params.operating_system == OperatingSystem.WINDOWS -%}
+      {% endif %}
+      {% elif params.operating_system == OperatingSystem.WINDOWS %}
       - run: cmake -S . -B build -G "Visual Studio 17 2022" -A {$ params.target_architecture $} -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
-      {%- endif %}
+      {% endif %}
 {% endfor %}
 
 
