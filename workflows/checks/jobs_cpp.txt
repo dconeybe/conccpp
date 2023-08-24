@@ -120,30 +120,15 @@
       {% elif params.operating_system == OperatingSystem.WINDOWS %}
       - run: cmake -S . -B build -G "Visual Studio 17 2022" -A {$ params.target_architecture $} -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
       {% endif %}
+      {% if params.operating_system == OperatingSystem.LINUX or params.operating_system == OperatingSystem.MACOS %}
+      - run: cmake --build build
+      {% elif params.operating_system == OperatingSystem.WINDOWS %}
+      - run: cmake --build build --config {$ cmake_build_type_for_build_config(params.build_config) $}
+      {% endif %}
+      {% if params.operating_system == OperatingSystem.LINUX or params.operating_system == OperatingSystem.MACOS %}
+      - run: ctest --verbose
+      {% elif params.operating_system == OperatingSystem.WINDOWS %}
+      - run: ctest -C {$ cmake_build_type_for_build_config(params.build_config) $} --verbose
+      {% endif %}
+        working-directory: build
 {% endfor %}
-
-
-
-  cpp-test:
-    steps:
-      - if: runner.os == 'Linux'
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_config }} -G Ninja -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
-        env:
-          CC: ${{ matrix.compiler == 'clang' && 'clang' || 'gcc' }}
-          CXX: ${{ matrix.compiler == 'clang' && 'clang++' || 'g++' }}
-      - if: runner.os == 'macOS'
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=${{ matrix.build_config }} -G Ninja -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
-      - if: runner.os == 'Windows'
-        run: cmake -S . -B build -G "Visual Studio 17 2022" -A ${{ matrix.target_architecture }} -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
-
-      - if: runner.os != 'Windows'
-        run: cmake --build build
-      - if: runner.os == 'Windows'
-        run: cmake --build build --config ${{ matrix.build_config }}
-
-      - if: runner.os != 'Windows'
-        run: ctest --verbose
-        working-directory: build
-      - if: runner.os == 'Windows'
-        run: ctest -C ${{ matrix.build_config }} --verbose
-        working-directory: build
