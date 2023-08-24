@@ -3,8 +3,8 @@ import enum
 import pathlib
 
 from absl import app
-from absl import flags
 import jinja2
+
 
 def main(argv: list[str]) -> None:
   if len(argv) > 1:
