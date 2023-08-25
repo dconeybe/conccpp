@@ -114,6 +114,8 @@
       - run: brew install ninja
       {% endif %}
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
       {% if params.operating_system == OperatingSystem.LINUX or params.operating_system == OperatingSystem.MACOS %}
       - run: cmake -S . -B build -DCMAKE_BUILD_TYPE={$ cmake_build_type_for_build_config(params.build_config) $} -G Ninja {$ common_cmake_configure_flags() $}
       {% if params.compiler %}

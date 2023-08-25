@@ -7,6 +7,8 @@
       - run: pip install pyink
 
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
 
       - run: ./scripts/format.sh -c
 
@@ -19,6 +21,8 @@
       - run: pip install pyflakes
 
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
 
       - run: ./scripts/lint.sh
 
@@ -36,6 +40,8 @@
       - run: pip install absl-py
 
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
 
       - run: ./scripts/test.sh
         shell: bash
