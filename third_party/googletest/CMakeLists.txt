@@ -1,4 +1,4 @@
-include(../../cmake/GetUserHomeDir.cmake)
+include(ConcppGetUserHomeDir)
 
 list(APPEND CMAKE_MESSAGE_CONTEXT "googletest")
 
@@ -34,8 +34,7 @@ else()
 endif()
 
 if(do_download_and_extract)
-  include(../../cmake/GetUserHomeDir.cmake)
-  GetUserHomeDir(home_dir)
+  ConcppGetUserHomeDir(home_dir)
 
   option(
     CONCPP_DOWNLOAD_CACHE_ENABLED

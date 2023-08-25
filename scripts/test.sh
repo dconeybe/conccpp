@@ -5,7 +5,7 @@ set -euo pipefail
 pass_count=0
 fail_count=0
 
-for f in cmake/*.test.py ; do
+for f in cmake/test/*.test.py ; do
   echo "Running test: $f"
   if python "$f" ; then
     pass_count=$((pass_count + 1))
@@ -15,14 +15,12 @@ for f in cmake/*.test.py ; do
 done
 
 echo
-echo '------------'
-echo 'TEST SUMMARY'
-echo '------------'
-echo "Tests Run:    $((pass_count+fail_count))"
-echo "Tests Passed: ${pass_count}"
-echo "Tests Failed: ${fail_count}"
-
-if [[ fail_count -gt 0 ]] ; then
+if [[ fail_count -eq 0 ]] ; then
+  echo "All ${pass_count} tests passed :)"
+else
+  echo "Tests Run:    $((pass_count+fail_count))"
+  echo "Tests Passed: ${pass_count}"
+  echo "Tests Failed: ${fail_count}"
   echo
   echo '***************************************************************'
   echo '** TEST FAILURES OCCURRED'

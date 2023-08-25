@@ -4,7 +4,7 @@ set -euo pipefail
 
 readonly pyflakes_args=(
   pyflakes
-  cmake/*.py
+  cmake/test/*.py
   workflows/checks/*.py
   "$@"
 )

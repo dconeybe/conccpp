@@ -1,4 +1,4 @@
-function(GetUserHomeDir OUTVAR)
+function(ConcppGetUserHomeDir OUTVAR)
   list(APPEND CMAKE_MESSAGE_CONTEXT "GetUserHomeDir")
 
   if(ARGC GREATER 1)

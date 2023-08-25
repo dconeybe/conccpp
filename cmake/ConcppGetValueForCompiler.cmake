@@ -1,4 +1,4 @@
-function(GetValueForCompiler OUTVAR GCC_VALUE MSVC_VALUE DEFAULT_VALUE)
+function(ConcppGetValueForCompiler OUTVAR GCC_VALUE MSVC_VALUE DEFAULT_VALUE)
   list(APPEND CMAKE_MESSAGE_CONTEXT "GetValueForCompiler")
 
   if(ARGC GREATER 4)

@@ -8,13 +8,13 @@ from absl.testing import absltest
 import util
 
 
-CMAKE_MODULE_PATH = pathlib.Path(__file__).parent / "GetValueForCompiler.cmake"
+CMAKE_MODULE_PATH = pathlib.Path(__file__).parent.parent / "ConcppGetValueForCompiler.cmake"
 
 
-class GetValueForCompiler(absltest.TestCase):
+class ConcppGetValueForCompilerTest(absltest.TestCase):
 
   def test_returns_gcc_value_when_compiler_frontend_is_GNU(self):
-    self.assertGetValueForCompilerReturns(
+    self.assertConcppGetValueForCompilerReturns(
         expected_result="zzyzx_gcc",
         gcc_value="zzyzx_gcc",
         msvc_value="zzyzx_msvc",
@@ -23,7 +23,7 @@ class GetValueForCompiler(absltest.TestCase):
     )
 
   def test_returns_gcc_value_when_compiler_id_is_GNU(self):
-    self.assertGetValueForCompilerReturns(
+    self.assertConcppGetValueForCompilerReturns(
         expected_result="zzyzx_gcc",
         gcc_value="zzyzx_gcc",
         msvc_value="zzyzx_msvc",
@@ -32,7 +32,7 @@ class GetValueForCompiler(absltest.TestCase):
     )
 
   def test_returns_gcc_value_when_compiler_frontend_is_Clang(self):
-    self.assertGetValueForCompilerReturns(
+    self.assertConcppGetValueForCompilerReturns(
         expected_result="zzyzx_gcc",
         gcc_value="zzyzx_gcc",
         msvc_value="zzyzx_msvc",
@@ -41,7 +41,7 @@ class GetValueForCompiler(absltest.TestCase):
     )
 
   def test_returns_gcc_value_when_compiler_id_is_Clang(self):
-    self.assertGetValueForCompilerReturns(
+    self.assertConcppGetValueForCompilerReturns(
         expected_result="zzyzx_gcc",
         gcc_value="zzyzx_gcc",
         msvc_value="zzyzx_msvc",
@@ -50,7 +50,7 @@ class GetValueForCompiler(absltest.TestCase):
     )
 
   def test_returns_gcc_value_when_compiler_frontend_is_AppleClang(self):
-    self.assertGetValueForCompilerReturns(
+    self.assertConcppGetValueForCompilerReturns(
         expected_result="zzyzx_gcc",
         gcc_value="zzyzx_gcc",
         msvc_value="zzyzx_msvc",
@@ -59,7 +59,7 @@ class GetValueForCompiler(absltest.TestCase):
     )
 
   def test_returns_gcc_value_when_compiler_id_is_AppleClang(self):
-    self.assertGetValueForCompilerReturns(
+    self.assertConcppGetValueForCompilerReturns(
         expected_result="zzyzx_gcc",
         gcc_value="zzyzx_gcc",
         msvc_value="zzyzx_msvc",
@@ -68,7 +68,7 @@ class GetValueForCompiler(absltest.TestCase):
     )
 
   def test_returns_msvc_value_when_compiler_frontend_is_MSVC(self):
-    self.assertGetValueForCompilerReturns(
+    self.assertConcppGetValueForCompilerReturns(
         expected_result="zzyzx_msvc",
         gcc_value="zzyzx_gcc",
         msvc_value="zzyzx_msvc",
@@ -77,7 +77,7 @@ class GetValueForCompiler(absltest.TestCase):
     )
 
   def test_returns_msvc_value_when_compiler_id_is_MSVC(self):
-    self.assertGetValueForCompilerReturns(
+    self.assertConcppGetValueForCompilerReturns(
         expected_result="zzyzx_msvc",
         gcc_value="zzyzx_gcc",
         msvc_value="zzyzx_msvc",
@@ -86,7 +86,7 @@ class GetValueForCompiler(absltest.TestCase):
     )
 
   def test_returns_default_value_when_compiler_frontend_is_something_else(self):
-    self.assertGetValueForCompilerReturns(
+    self.assertConcppGetValueForCompilerReturns(
         expected_result="zzyzx_default",
         gcc_value="zzyzx_gcc",
         msvc_value="zzyzx_msvc",
@@ -95,7 +95,7 @@ class GetValueForCompiler(absltest.TestCase):
     )
 
   def test_returns_default_value_when_compiler_id_is_something_else(self):
-    self.assertGetValueForCompilerReturns(
+    self.assertConcppGetValueForCompilerReturns(
         expected_result="zzyzx_default",
         gcc_value="zzyzx_gcc",
         msvc_value="zzyzx_msvc",
@@ -104,7 +104,7 @@ class GetValueForCompiler(absltest.TestCase):
     )
 
   def test_compiler_frontent_variant_takes_precendence_over_compiler_id_GNU(self):
-    self.assertGetValueForCompilerReturns(
+    self.assertConcppGetValueForCompilerReturns(
         expected_result="zzyzx_gcc",
         gcc_value="zzyzx_gcc",
         msvc_value="zzyzx_msvc",
@@ -114,7 +114,7 @@ class GetValueForCompiler(absltest.TestCase):
     )
 
   def test_compiler_frontent_variant_takes_precendence_over_compiler_id_MSVC(self):
-    self.assertGetValueForCompilerReturns(
+    self.assertConcppGetValueForCompilerReturns(
         expected_result="zzyzx_msvc",
         gcc_value="zzyzx_gcc",
         msvc_value="zzyzx_msvc",
@@ -123,7 +123,7 @@ class GetValueForCompiler(absltest.TestCase):
         compiler_id="GNU",
     )
 
-  def assertGetValueForCompilerReturns(
+  def assertConcppGetValueForCompilerReturns(
       self,
       expected_result: str,
       gcc_value: str,
@@ -132,7 +132,7 @@ class GetValueForCompiler(absltest.TestCase):
       compiler_frontend_variant: str | None = None,
       compiler_id: str | None = None,
   ) -> None:
-    result = self.callGetValueForCompiler(
+    result = self.callConcppGetValueForCompiler(
         gcc_value=gcc_value,
         msvc_value=msvc_value,
         default_value=default_value,
@@ -142,7 +142,7 @@ class GetValueForCompiler(absltest.TestCase):
 
     self.assertIsNotNone(
         result.return_value,
-        "GetValueForCompiler() failed, "
+        "ConcppGetValueForCompiler() failed, "
         "but should have completed successfully with result: {expected_result} "
         f"output: {result.output} "
         f"cmake script: {result.script}",
@@ -150,12 +150,12 @@ class GetValueForCompiler(absltest.TestCase):
     self.assertEqual(
         result.return_value,
         expected_result,
-        "GetValueForCompiler() returned a different value from what was expected; "
+        "ConcppGetValueForCompiler() returned a different value from what was expected; "
         f"output: {result.output} "
         f"cmake script: {result.script}",
     )
 
-  def callGetValueForCompiler(
+  def callConcppGetValueForCompiler(
       self,
       gcc_value: str,
       msvc_value: str,
@@ -177,7 +177,7 @@ class GetValueForCompiler(absltest.TestCase):
     return util.call_cmake_function(
         test_case=self,
         cmake_file=CMAKE_MODULE_PATH,
-        function_name="GetValueForCompiler",
+        function_name="ConcppGetValueForCompiler",
         function_out_var="return_value",
         function_arguments=function_arguments,
         cmake_variables=cmake_variables,
