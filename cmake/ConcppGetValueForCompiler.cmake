@@ -1,5 +1,5 @@
-function(GetValueForCompiler OUTVAR GCC_VALUE MSVC_VALUE DEFAULT_VALUE)
-  list(APPEND CMAKE_MESSAGE_CONTEXT "GetValueForCompiler")
+function(ConcppGetValueForCompiler OUTVAR GCC_VALUE MSVC_VALUE DEFAULT_VALUE)
+  list(APPEND CMAKE_MESSAGE_CONTEXT "ConcppGetValueForCompiler")
 
   if(ARGC GREATER 4)
     list(JOIN ARGN ", " ARGN_STR)

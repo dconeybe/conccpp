@@ -49,7 +49,7 @@ function run_pyink {
     --target-version py311
     --pyink
     --pyink-indentation 2
-    cmake/*.py
+    cmake/test/*.py
     workflows/checks/*.py
   )
 
