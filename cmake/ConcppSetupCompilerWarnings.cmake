@@ -1,6 +1,7 @@
 block()
 
 include(CheckCXXCompilerFlag)
+include(ConcppGetValueForCompiler)
 
 list(APPEND CMAKE_MESSAGE_CONTEXT "ConcppSetupCompilerWarnings")
 
@@ -54,39 +55,19 @@ set(all_warning_flags_msvc
   /we4289
 )
 
-message(VERBOSE "CMAKE_CXX_COMPILER_FRONTEND_VARIANT=${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}")
-message(VERBOSE "CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID}")
+ConcppGetValueForCompiler(
+  "all_warning_flags"
+  "${all_warning_flags_gnu}"
+  "${all_warning_flags_msvc}"
+  "NOTFOUND"
+)
 
-# Determine the "flavor" of warning flags to used based on the compiler cmake is using.
-if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT)
-  if(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "GNU")
-    set(all_warning_flags "${all_warning_flags_gnu}")
-  elseif(CMAKE_CXX_COMPILER_FRONTEND_VARIANT MATCHES "Clang")
-    set(all_warning_flags "${all_warning_flags_gnu}")
-  elseif(CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
-    set(all_warning_flags "${all_warning_flags_msvc}")
-  else()
-    unset(all_warning_flags)
-    message(
-      NOTICE
-      "Compiler flags for enabling warnings for "
-      "CMAKE_CXX_COMPILER_FRONTEND_VARIANT=${CMAKE_CXX_COMPILER_FRONTEND_VARIANT} "
-      "are not known; not adding compiler flags to enable warnings."
-    )
-  endif()
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-  set(all_warning_flags "${all_warning_flags_gnu}")
-elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-  set(all_warning_flags "${all_warning_flags_gnu}")
-elseif(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-  set(all_warning_flags "${all_warning_flags_msvc}")
-else()
+if(NOT all_warning_flags)
   unset(all_warning_flags)
   message(
     NOTICE
-    "Compiler flags for enabling warnings for "
-    "CMAKE_CXX_COMPILER_ID=${CMAKE_CXX_COMPILER_ID} "
-    "are not known; not adding compiler flags to enable warnings."
+    "Compiler flags for enabling warnings for the current compiler are not known; "
+    "not adding compiler flags to enable warnings."
   )
 endif()
 
