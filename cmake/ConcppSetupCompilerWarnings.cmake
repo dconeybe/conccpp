@@ -2,7 +2,7 @@ block()
 
 include(CheckCXXCompilerFlag)
 
-list(APPEND CMAKE_MESSAGE_CONTEXT "SetupCompilerWarnings")
+list(APPEND CMAKE_MESSAGE_CONTEXT "ConcppSetupCompilerWarnings")
 
 set(all_warning_flags_gnu
   -Wall

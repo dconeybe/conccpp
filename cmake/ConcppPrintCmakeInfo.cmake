@@ -1,6 +1,6 @@
 block()
 
-list(APPEND CMAKE_MESSAGE_CONTEXT "PrintCmakeInfo")
+list(APPEND CMAKE_MESSAGE_CONTEXT "ConcppPrintCmakeInfo")
 
 set(vars "")
 list(APPEND vars "CMAKE_COMMAND")
