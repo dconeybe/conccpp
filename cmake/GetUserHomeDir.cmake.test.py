@@ -15,15 +15,18 @@ class GetUserHomeDirTest(absltest.TestCase):
 
   def test_fails_when_given_an_extra_argument(self):
     result = self.callGetUserHomeDir(extra_arguments=["zzyzx"])
+
     self.assertIsNone(
         result.return_value,
         "GetUserHomeDir() should have failed, "
-        f"but it completed successfully with result: {result.return_value}",
+        f"but it completed successfully with result: {result.return_value} "
+        f"output: {result.output} "
+        f"cmake script: {result.script}",
     )
     self.assertIn(
         "GetUserHomeDir was invoked with 2 arguments, "
         "but exactly 1 expected (unexpected arguments: zzyzx)",
-        result.output,
+        result.output_singleline,
     )
 
   def test_returns_not_found_if_home_and_userprofile_env_vars_not_set(self):
@@ -50,15 +53,22 @@ class GetUserHomeDirTest(absltest.TestCase):
       expected_result: str,
       env: dict[str, str] | None = None,
       env_unset: list[str] | None = None,
-  ) -> str:
+  ) -> None:
     result = self.callGetUserHomeDir(env=env, env_unset=env_unset)
     self.assertIsNotNone(
         result.return_value,
         "GetUserHomeDir() failed, "
         "but should have completed successfully with result: {expected_result} "
-        f"(output: {result.output})",
+        f"output: {result.output} "
+        f"cmake script: {result.script}",
     )
-    self.assertEqual(result.return_value, expected_result)
+    self.assertEqual(
+        result.return_value,
+        expected_result,
+        "GetUserHomeDir() returned a different value from what was expected; "
+        f"output: {result.output} "
+        f"cmake script: {result.script}",
+    )
 
   def callGetUserHomeDir(
       self,
