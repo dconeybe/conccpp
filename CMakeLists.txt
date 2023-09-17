@@ -21,4 +21,4 @@ add_subdirectory(third_party)
 # warnings from third-party code.
 include(ConcppSetupCompilerWarnings)
 
-add_subdirectory(stack)
+add_subdirectory(src)
