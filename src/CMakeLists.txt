@@ -1,12 +1,12 @@
 add_library(
-  concpp_stack
-  src/concpp/stack.cc
+  concpp
+  dummy.cc
 )
 
 target_include_directories(
-  concpp_stack
+  concpp
   PUBLIC
-  "include"
+  include
 )
 
 if(BUILD_TESTING)
