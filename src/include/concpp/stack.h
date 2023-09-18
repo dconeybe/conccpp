@@ -50,7 +50,7 @@ class stack final {
         return {};
       }
 
-      if (head_.compare_exchange_strong(head, head->next)) {
+      if (head_.compare_exchange_weak(head, head->next)) {
         // TODO: Delete the `head` node, which is currently leaking.
         return std::move(head->data);
       }
