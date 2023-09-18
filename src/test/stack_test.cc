@@ -84,18 +84,18 @@ void test_concurrent_push_and_pop_threads(unsigned push_thread_count, unsigned p
 
   // Create the "pusher" threads.
   // Each pushed thread pushes a bunch of values onto the stack.
-  for (unsigned i=0; i<push_thread_count; i++) {
+  for (unsigned push_thread_index=0; push_thread_index<push_thread_count; push_thread_index++) {
     threads.emplace_back([&] {
       latch.arrive_and_wait();
-      for (int i=0; i<100'000; i++) {
-        stack.push(i);
+      for (int value_to_push=0; value_to_push<100'000; value_to_push++) {
+        stack.push(value_to_push);
       }
     });
   }
 
   // Create the "popper" threads.
   // Each popper thread repeatedly pops a value off of the stack.
-  for (unsigned i=0; i<pop_thread_count; i++) {
+  for (unsigned pop_thread_index=0; pop_thread_index<pop_thread_count; pop_thread_index++) {
     threads.emplace_back([&] {
       // Create a vector into which the values popped by this thread will be stored.
       std::vector<int> my_popped_values;

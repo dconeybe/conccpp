@@ -65,7 +65,7 @@ class stack final {
 
  private:
   struct node {
-    std::unique_ptr<T> data;
+    std::unique_ptr<T> data{};
     node* next = nullptr;
   }; // class node
 
