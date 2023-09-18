@@ -95,6 +95,7 @@ jobs:
           fetch-depth: 1
       - run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -G Ninja -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
         env:
+          CXXFLAGS: -fsanitize=thread
           CC: gcc
           CXX: g++
       - run: cmake --build build
@@ -110,6 +111,7 @@ jobs:
           fetch-depth: 1
       - run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G Ninja -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
         env:
+          CXXFLAGS: -fsanitize=thread
           CC: gcc
           CXX: g++
       - run: cmake --build build
@@ -125,6 +127,7 @@ jobs:
           fetch-depth: 1
       - run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -G Ninja -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
         env:
+          CXXFLAGS: -fsanitize=thread
           CC: clang
           CXX: clang++
       - run: cmake --build build
@@ -140,6 +143,7 @@ jobs:
           fetch-depth: 1
       - run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G Ninja -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
         env:
+          CXXFLAGS: -fsanitize=thread
           CC: clang
           CXX: clang++
       - run: cmake --build build
@@ -154,6 +158,8 @@ jobs:
         with:
           fetch-depth: 1
       - run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -G Ninja -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
+        env:
+          CXXFLAGS: -fsanitize=thread
       - run: cmake --build build
       - run: ctest --verbose
         working-directory: build
@@ -166,6 +172,8 @@ jobs:
         with:
           fetch-depth: 1
       - run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -G Ninja -DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
+        env:
+          CXXFLAGS: -fsanitize=thread
       - run: cmake --build build
       - run: ctest --verbose
         working-directory: build
