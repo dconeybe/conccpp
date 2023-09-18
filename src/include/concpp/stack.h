@@ -30,12 +30,31 @@ class stack final {
     return push(std::make_unique<T>(std::move(value)));
   }
 
-  void push(std::unique_ptr<T>) {
+  void push(std::unique_ptr<T> data) {
+    // Create the new node to put onto the top of the stack; initialize its "next" pointer to whatever the current
+    // "head" node is.
+    node* new_head = new node;
+    new_head->data = std::move(data);
+    new_head->next = head_.load();
 
+    // Replace the current "head" node with the new node. If the "head" node changed since the last time we read it then
+    // update the "next" pointer to the new head (as a side effect of `compare_exchange_weak()`) and try again.
+    while (!head_.compare_exchange_weak(new_head->next, new_head));
   }
 
   std::unique_ptr<T> pop() {
-    return {};
+    node* head = head_.load();
+    while (true) {
+      // Return a "null" value if this stack is empty, which is indicated by the "next" pointer of "head" being null.
+      if (!head->next) {
+        return {};
+      }
+
+      if (head_.compare_exchange_strong(head, head->next)) {
+        // TODO: Delete the `head` node, which is currently leaking.
+        return std::move(head->data);
+      }
+    }
   }
 
   // Move and delete copy constructors and assignment operators are not supported.
