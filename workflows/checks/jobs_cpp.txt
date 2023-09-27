@@ -1,145 +1,123 @@
 {% set cpp_tests = [
-  CppTestParameters(
-    operating_system=OperatingSystem.LINUX,
-    build_config=BuildConfig.DEBUG,
-    compiler=Compiler.GCC
+  dict(
+    operating_system="linux",
+    build_config="Debug",
+    compiler=("gcc", "g++"),
+    sanitizer="thread",
   ),
-  CppTestParameters(
-    operating_system=OperatingSystem.LINUX,
-    build_config=BuildConfig.RELEASE,
-    compiler=Compiler.GCC,
+  dict(
+    operating_system="linux",
+    build_config="Release",
+    compiler=("gcc", "g++"),
   ),
-  CppTestParameters(
-    operating_system=OperatingSystem.LINUX,
-    build_config=BuildConfig.DEBUG,
-    compiler=Compiler.CLANG,
+  dict(
+    operating_system="linux",
+    build_config="Debug",
+    compiler=("clang", "clang++"),
+    sanitizer="thread",
   ),
-  CppTestParameters(
-    operating_system=OperatingSystem.LINUX,
-    build_config=BuildConfig.RELEASE,
-    compiler=Compiler.CLANG,
+  dict(
+    operating_system="linux",
+    build_config="Release",
+    compiler=("clang", "clang++"),
   ),
-  CppTestParameters(
-    operating_system=OperatingSystem.MACOS,
-    build_config=BuildConfig.DEBUG,
+  dict(
+    operating_system="macos",
+    build_config="Debug",
+    sanitizer="thread",
   ),
-  CppTestParameters(
-    operating_system=OperatingSystem.MACOS,
-    build_config=BuildConfig.RELEASE,
+  dict(
+    operating_system="macos",
+    build_config="Release",
   ),
-  CppTestParameters(
-    operating_system=OperatingSystem.WINDOWS,
-    build_config=BuildConfig.DEBUG,
+  dict(
+    operating_system="windows",
+    build_config="Debug",
     target_architecture="Win32",
   ),
-  CppTestParameters(
-    operating_system=OperatingSystem.WINDOWS,
-    build_config=BuildConfig.RELEASE,
+  dict(
+    operating_system="windows",
+    build_config="Release",
     target_architecture="Win32",
   ),
-  CppTestParameters(
-    operating_system=OperatingSystem.WINDOWS,
-    build_config=BuildConfig.DEBUG,
+  dict(
+    operating_system="windows",
+    build_config="Debug",
     target_architecture="x64",
   ),
-  CppTestParameters(
-    operating_system=OperatingSystem.WINDOWS,
-    build_config=BuildConfig.RELEASE,
+  dict(
+    operating_system="windows",
+    build_config="Release",
     target_architecture="x64",
   ),
-] -%}
+]
+-%}
 
-{%- macro cmake_build_type_for_build_config(build_config) -%}
-  {%- if build_config == BuildConfig.RELEASE -%}Release
-  {%- elif build_config == BuildConfig.DEBUG -%}Debug
-  {%- else -%}ERROR: unknown build_config: {$ build_config $}
-  {%- endif -%}
-{%- endmacro -%}
-
-{%- macro name_for_operating_system(operating_system) -%}
-  {%- if operating_system == OperatingSystem.LINUX -%}linux
-  {%- elif operating_system == OperatingSystem.MACOS -%}macos
-  {%- elif operating_system == OperatingSystem.WINDOWS -%}windows
-  {%- else -%}ERROR: unknown operating_system: {$ operating_system $}
-  {%- endif -%}
-{%- endmacro -%}
-
-{% macro github_runner_for_operating_system(operating_system) %}
-  {%- if operating_system == OperatingSystem.LINUX -%}ubuntu-latest
-  {%- elif operating_system == OperatingSystem.MACOS -%}macos-latest
-  {%- elif operating_system == OperatingSystem.WINDOWS -%}windows-latest
-  {%- else -%}ERROR: unknown operating_system: {$ operating_system $}
-  {%- endif -%}
-{%- endmacro -%}
-
-{% macro name_for_compiler(compiler) %}
-  {%- if compiler == Compiler.GCC -%}gcc
-  {%- elif compiler == Compiler.CLANG -%}clang
-  {%- else -%}ERROR: unknown compiler: {$ compiler $}
-  {%- endif -%}
-{%- endmacro -%}
-
-{% macro c_compiler_command_for_compiler(compiler) %}
-  {%- if compiler == Compiler.GCC -%}gcc
-  {%- elif compiler == Compiler.CLANG -%}clang
-  {%- else -%}ERROR: unknown compiler: {$ compiler $}
-  {%- endif -%}
-{%- endmacro -%}
-
-{% macro cpp_compiler_command_for_compiler(compiler) -%}
-  {%- if compiler == Compiler.GCC -%}g++
-  {%- elif compiler == Compiler.CLANG -%}clang++
-  {%- else -%}ERROR: unknown compiler: {$ compiler $}
+{%- macro github_runner_for_operating_system(operating_system) -%}
+  {%- if operating_system == "linux" -%}ubuntu-latest
+  {%- elif operating_system == "macos" -%}macos-latest
+  {%- elif operating_system == "windows" -%}windows-latest
+  {%- else -%}{% raise "unknown operating_system: " + operating_system %}
   {%- endif -%}
 {%- endmacro -%}
 
 {%- macro common_cmake_configure_flags() -%}
--DCONCPP_LOG_CMAKE_INFO=YES -DCMAKE_COMPILE_WARNING_AS_ERROR=YES --log-context
+  {%- filter replace_whitespace(" ") -%}
+    -DCONCPP_LOG_CMAKE_INFO=YES
+    -DCMAKE_COMPILE_WARNING_AS_ERROR=YES
+    --log-context
+  {%- endfilter -%}
+{%- endmacro -%}
+
+{%- macro cpp_test_job_name_for_test_params(params) -%}
+  {%- filter replace_whitespace("") -%}
+  {% filter lower %}
+    cpp-test-
+    {$ params.operating_system $}-
+    {$ params.build_config $}
+    {% if "compiler" in params %}-{$ params.compiler[0] $}{% endif %}
+    {% if "target_architecture" in params %}-{$ params.target_architecture $}{% endif %}
+  {% endfilter %}
+  {%- endfilter -%}
 {%- endmacro -%}
 
 {% for params in cpp_tests %}
 
-  {%+ filter lower -%}
-    cpp-test-
-    {$- name_for_operating_system(params.operating_system) -$}-
-    {$- cmake_build_type_for_build_config(params.build_config) -$}
-    {%- if params.compiler %}-{$ name_for_compiler(params.compiler) $}{% endif -%}
-    {%- if params.target_architecture %}-{$ params.target_architecture $}{% endif -%}
-  {%- endfilter %}:
+  {$ cpp_test_job_name_for_test_params(params) $}:
     runs-on: {$ github_runner_for_operating_system(params.operating_system) $}
     steps:
-      {% if params.operating_system == OperatingSystem.LINUX %}
+      {% if params.operating_system == "linux" %}
       - run: sudo apt-get install -y ninja-build
-      {% elif params.operating_system == OperatingSystem.MACOS %}
+      {% elif params.operating_system == "macos" %}
       - run: brew install ninja
       {% endif %}
       - uses: actions/checkout@v3
         with:
           fetch-depth: 1
-      {% if params.operating_system == OperatingSystem.LINUX or params.operating_system == OperatingSystem.MACOS %}
-      - run: cmake -S . -B build -DCMAKE_BUILD_TYPE={$ cmake_build_type_for_build_config(params.build_config) $} -G Ninja {$ common_cmake_configure_flags() $}
-      {% if params.compiler or params.build_config==BuildConfig.DEBUG %}
+      {% if params.operating_system == "linux" or params.operating_system == "macos" %}
+      - run: cmake -S . -B build -DCMAKE_BUILD_TYPE={$ params.build_config $} -G Ninja {$ common_cmake_configure_flags() $}
+      {% if "sanitizer" in params or "compiler" in params %}
         env:
       {% endif %}
-      {% if params.build_config==BuildConfig.DEBUG %}
-          CXXFLAGS: -fsanitize=thread
+      {% if "sanitizer" in params %}
+          CXXFLAGS: -fsanitize={$ params.sanitizer $}
       {% endif %}
-      {% if params.compiler %}
-          CC: {$ c_compiler_command_for_compiler(params.compiler) $}
-          CXX: {$ cpp_compiler_command_for_compiler(params.compiler) $}
+      {% if "compiler" in params %}
+          CC: {$ params.compiler[0] $}
+          CXX: {$ params.compiler[1] $}
       {% endif %}
-      {% elif params.operating_system == OperatingSystem.WINDOWS %}
+      {% elif params.operating_system == "windows" %}
       - run: cmake -S . -B build -G "Visual Studio 17 2022" -A {$ params.target_architecture $} {$ common_cmake_configure_flags() $}
       {% endif %}
-      {% if params.operating_system == OperatingSystem.LINUX or params.operating_system == OperatingSystem.MACOS %}
+      {% if params.operating_system == "linux" or params.operating_system == "macos" %}
       - run: cmake --build build
-      {% elif params.operating_system == OperatingSystem.WINDOWS %}
-      - run: cmake --build build --config {$ cmake_build_type_for_build_config(params.build_config) $}
+      {% elif params.operating_system == "windows" %}
+      - run: cmake --build build --config {$ params.build_config $}
       {% endif %}
-      {% if params.operating_system == OperatingSystem.LINUX or params.operating_system == OperatingSystem.MACOS %}
+      {% if params.operating_system == "linux" or params.operating_system == "macos" %}
       - run: ctest --verbose
-      {% elif params.operating_system == OperatingSystem.WINDOWS %}
-      - run: ctest -C {$ cmake_build_type_for_build_config(params.build_config) $} --verbose
+      {% elif params.operating_system == "windows" %}
+      - run: ctest -C {$ params.build_config $} --verbose
       {% endif %}
         working-directory: build
 {% endfor %}
