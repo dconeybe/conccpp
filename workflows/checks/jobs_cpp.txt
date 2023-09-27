@@ -1,51 +1,51 @@
 {% set cpp_tests = [
-  dict(
+  CppTestParams(
     operating_system="linux",
     build_config="Debug",
     compiler=("gcc", "g++"),
     sanitizer="thread",
   ),
-  dict(
+  CppTestParams(
     operating_system="linux",
     build_config="Release",
     compiler=("gcc", "g++"),
   ),
-  dict(
+  CppTestParams(
     operating_system="linux",
     build_config="Debug",
     compiler=("clang", "clang++"),
     sanitizer="thread",
   ),
-  dict(
+  CppTestParams(
     operating_system="linux",
     build_config="Release",
     compiler=("clang", "clang++"),
   ),
-  dict(
+  CppTestParams(
     operating_system="macos",
     build_config="Debug",
     sanitizer="thread",
   ),
-  dict(
+  CppTestParams(
     operating_system="macos",
     build_config="Release",
   ),
-  dict(
+  CppTestParams(
     operating_system="windows",
     build_config="Debug",
     target_architecture="Win32",
   ),
-  dict(
+  CppTestParams(
     operating_system="windows",
     build_config="Release",
     target_architecture="Win32",
   ),
-  dict(
+  CppTestParams(
     operating_system="windows",
     build_config="Debug",
     target_architecture="x64",
   ),
-  dict(
+  CppTestParams(
     operating_system="windows",
     build_config="Release",
     target_architecture="x64",
@@ -62,7 +62,7 @@
 {%- endmacro -%}
 
 {%- macro common_cmake_configure_flags() -%}
-  {%- filter replace_whitespace(" ") -%}
+  {%- filter replace_whitespace_with(" ") -%}
     -DCONCPP_LOG_CMAKE_INFO=YES
     -DCMAKE_COMPILE_WARNING_AS_ERROR=YES
     --log-context
@@ -70,13 +70,13 @@
 {%- endmacro -%}
 
 {%- macro cpp_test_job_name_for_test_params(params) -%}
-  {%- filter replace_whitespace("") -%}
+  {%- filter replace_whitespace_with("") -%}
   {% filter lower %}
     cpp-test-
     {$ params.operating_system $}-
     {$ params.build_config $}
-    {% if "compiler" in params %}-{$ params.compiler[0] $}{% endif %}
-    {% if "target_architecture" in params %}-{$ params.target_architecture $}{% endif %}
+    {% if params.compiler %}-{$ params.compiler[0] $}{% endif %}
+    {% if params.target_architecture %}-{$ params.target_architecture $}{% endif %}
   {% endfilter %}
   {%- endfilter -%}
 {%- endmacro -%}
@@ -96,13 +96,13 @@
           fetch-depth: 1
       {% if params.operating_system == "linux" or params.operating_system == "macos" %}
       - run: cmake -S . -B build -DCMAKE_BUILD_TYPE={$ params.build_config $} -G Ninja {$ common_cmake_configure_flags() $}
-      {% if "sanitizer" in params or "compiler" in params %}
+      {% if params.sanitizer or params.compiler %}
         env:
       {% endif %}
-      {% if "sanitizer" in params %}
+      {% if params.sanitizer %}
           CXXFLAGS: -fsanitize={$ params.sanitizer $}
       {% endif %}
-      {% if "compiler" in params %}
+      {% if params.compiler %}
           CC: {$ params.compiler[0] $}
           CXX: {$ params.compiler[1] $}
       {% endif %}

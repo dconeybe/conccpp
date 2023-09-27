@@ -1,3 +1,4 @@
+import dataclasses
 import pathlib
 import re
 
@@ -23,16 +24,18 @@ def main(argv: list[str]) -> None:
       undefined=jinja2.StrictUndefined,
       extensions=[RaiseExtension],
   )
-  env.filters["replace_whitespace"] = replace_whitespace
+  env.filters["replace_whitespace_with"] = replace_whitespace_with
 
   template = env.get_template("index.txt")
 
-  rendered_template = template.render()
+  rendered_template = template.render(
+    CppTestParams=CppTestParams,
+  )
 
   print(rendered_template)
 
 
-def replace_whitespace(value: str, replacement: str) -> str:
+def replace_whitespace_with(value: str, replacement: str) -> str:
   return re.sub(r"\s+", replacement, value, flags=re.DOTALL)
 
 
@@ -63,6 +66,15 @@ class RaiseExtension(jinja2.ext.Extension):
 
   def _raise(self, msg, caller):
     raise jinja2.exceptions.TemplateRuntimeError(msg)
+
+
+@dataclasses.dataclass(frozen=True)
+class CppTestParams:
+  operating_system: str
+  build_config: str
+  compiler: tuple[str, str] | None = None
+  sanitizer: str | None = None
+  target_architecture: str | None = None
 
 
 if __name__ == "__main__":
