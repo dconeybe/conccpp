@@ -118,8 +118,13 @@
           fetch-depth: 1
       {% if params.operating_system == OperatingSystem.LINUX or params.operating_system == OperatingSystem.MACOS %}
       - run: cmake -S . -B build -DCMAKE_BUILD_TYPE={$ cmake_build_type_for_build_config(params.build_config) $} -G Ninja {$ common_cmake_configure_flags() $}
-      {% if params.compiler %}
+      {% if params.compiler or params.build_config==BuildConfig.DEBUG %}
         env:
+      {% endif %}
+      {% if params.build_config==BuildConfig.DEBUG %}
+          CXXFLAGS: -fsanitize=thread
+      {% endif %}
+      {% if params.compiler %}
           CC: {$ c_compiler_command_for_compiler(params.compiler) $}
           CXX: {$ cpp_compiler_command_for_compiler(params.compiler) $}
       {% endif %}
