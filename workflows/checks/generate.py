@@ -29,7 +29,7 @@ def main(argv: list[str]) -> None:
   template = env.get_template("index.txt")
 
   rendered_template = template.render(
-    CppTestParams=CppTestParams,
+      CppTestParams=CppTestParams,
   )
 
   print(rendered_template)
