@@ -2,82 +2,80 @@
 #define CONCPP_STACK_H_
 
 #include <atomic>
-#include <optional>
+#include <memory>
+#include <type_traits>
 #include <utility>
 
 namespace concpp {
 
-/**
- * A stack data structure that is lock-free.
- *
- * The `head_` pointer always points to a non-null object. Initially, it points to a "sentinel"
- * object. The "sentinel" can be identified because its `next` pointer is `nullptr`.
- */
 template<typename T>
-class LockFreeStack final {
-public:
-  ~LockFreeStack() {
-    Node* head = head_.load();
-    while (head) {
-      Node* next = head->next;
+class stack final {
+ public:
+  stack() : head_(new node) {
+  }
+
+  ~stack() {
+    node* head = head_.load();
+    while (true) {
+      if (!head) {
+        break;
+      }
+      node* next = head->next;
       delete head;
       head = next;
     }
   }
 
   void push(T value) {
-    auto *new_node = new Node(std::move(value), head_.load());
-    while (!head_.compare_exchange_weak(new_node->next, new_node));
+    return push(std::make_unique<T>(std::move(value)));
   }
 
-  std::optional<T> pop() {
-    Node *old_head = head_.load();
+  void push(std::unique_ptr<T> data) {
+    // Create the new node to put onto the top of the stack; initialize its "next" pointer to whatever the current
+    // "head" node is.
+    node* new_head = new node;
+    new_head->data = std::move(data);
+    new_head->next = head_.load();
+
+    // Replace the current "head" node with the new node. If the "head" node changed since the last time we read it then
+    // update the "next" pointer to the new head (as a side effect of `compare_exchange_weak()`) and try again.
+    while (!head_.compare_exchange_weak(new_head->next, new_head));
+  }
+
+  std::unique_ptr<T> pop() {
+    node* head = head_.load();
     while (true) {
-      if (!old_head->valid) {
-        return std::nullopt;
+      // Return a "null" value if this stack is empty, which is indicated by the "next" pointer of "head" being null.
+      if (!head->next) {
+        return {};
       }
-      if (head_.compare_exchange_weak(old_head, old_head->next)) {
-        break;
+
+      if (head_.compare_exchange_weak(head, head->next)) {
+        // TODO: Delete the `head` node, which is currently leaking.
+        return std::move(head->data);
       }
     }
-    return std::move(*old_head).value();
   }
 
-private:
-  struct Node {
-    Node() = default;
-    Node(const Node&) = delete;
-    Node& operator=(const Node&) = delete;
+  // Move and delete copy constructors and assignment operators are not supported.
+  stack(const stack&) = delete;
+  stack(stack&&) = delete;
+  stack& operator=(const stack&) = delete;
+  stack& operator=(stack&&) = delete;
 
-    Node(T value, Node* next_) : valid(true), next(next_) {
-      new(value_) T(std::move(value));
-    }
+ private:
+  struct node {
+    std::unique_ptr<T> data{};
+    node* next = nullptr;
+  }; // class node
 
-    ~Node() {
-      if (valid) {
-        value().~T();
-      }
-    }
+  [[maybe_unused]]
+  void type_traits_static_asserts() {
+    static_assert(decltype(head_)::is_always_lock_free);
+  }
 
-    const T& value() const& {
-      return *reinterpret_cast<const T*>(value_);
-    }
-
-    T& value() & {
-      return *reinterpret_cast<T*>(value_);
-    }
-
-    T&& value() && {
-      return std::move(*reinterpret_cast<T*>(value_));
-    }
-
-    bool valid = false;
-    Node *next = nullptr;
-    alignas(T) char value_[sizeof(T)]{};
-  };
-
-  std::atomic<Node *> head_ = new Node;
-};
+  std::atomic<node*> head_;
+}; // class stack
 
 } // namespace concpp
 
