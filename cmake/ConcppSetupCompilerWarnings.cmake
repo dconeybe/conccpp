@@ -10,6 +10,7 @@ set(all_warning_flags_gnu
   -Wextra
   -pedantic
   -Wcast-align
+  -Wconditional-uninitialized
   -Wconversion
   -Wdouble-promotion
   -Wduplicated-branches
@@ -17,16 +18,23 @@ set(all_warning_flags_gnu
   -Weffc++
   -Wformat=2
   -Wimplicit-fallthrough
+  -Winfinite-recursion
   -Wlifetime
   -Wlogical-op
+  -Wmove
   -Wmisleading-indentation
   -Wnon-virtual-dtor
   -Wnull-dereference
   -Wold-style-cast
   -Woverloaded-virtual
   -Wpedantic
+  -Wreorder
+  -Wrange-loop-analysis
+  -Wreturn-type
   -Wshadow
   -Wsign-conversion
+  -Wuninitialized
+  -Wunreachable-code
   -Wunused
   -Wuseless-cast
 )
@@ -34,6 +42,8 @@ set(all_warning_flags_gnu
 set(all_warning_flags_msvc
   /permissive
   /W4
+  /wd4146
+  /wd4566
   /w14242
   /w14254
   /w14263
