@@ -13,9 +13,9 @@ namespace concpp {
  * The `head_` pointer always points to a non-null object. Initially, it points to a "sentinel"
  * object. The "sentinel" can be identified because its `next` pointer is `nullptr`.
  */
-template<typename T>
+template <typename T>
 class LockFreeStack final {
-public:
+ public:
   ~LockFreeStack() {
     Node* head = head_.load();
     while (head) {
@@ -26,12 +26,13 @@ public:
   }
 
   void push(T value) {
-    auto *new_node = new Node(std::move(value), head_.load());
-    while (!head_.compare_exchange_weak(new_node->next, new_node));
+    auto* new_node = new Node(std::move(value), head_.load());
+    while (!head_.compare_exchange_weak(new_node->next, new_node))
+      ;
   }
 
   std::optional<T> pop() {
-    Node *old_head = head_.load();
+    Node* old_head = head_.load();
     while (true) {
       if (!old_head->valid) {
         return std::nullopt;
@@ -43,14 +44,14 @@ public:
     return std::move(*old_head).value();
   }
 
-private:
+ private:
   struct Node {
     Node() = default;
     Node(const Node&) = delete;
     Node& operator=(const Node&) = delete;
 
     Node(T value, Node* next_) : valid(true), next(next_) {
-      new(value_) T(std::move(value));
+      new (value_) T(std::move(value));
     }
 
     ~Node() {
@@ -72,13 +73,13 @@ private:
     }
 
     bool valid = false;
-    Node *next = nullptr;
+    Node* next = nullptr;
     alignas(T) char value_[sizeof(T)]{};
   };
 
-  std::atomic<Node *> head_ = new Node;
+  std::atomic<Node*> head_ = new Node;
 };
 
-} // namespace concpp
+}  // namespace concpp
 
 #endif  // CONCPP_STACK_H_

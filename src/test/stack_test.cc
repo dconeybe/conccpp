@@ -28,11 +28,11 @@ TEST(Stack, PushOnNewInstancePushesTheValue) {
 
 TEST(Stack, PushABunchThenPopThen) {
   LockFreeStack<int> stack;
-  for (int i=0; i<5; i++) {
+  for (int i = 0; i < 5; i++) {
     stack.push(i);
   }
 
-  for (int i=4; i>=0; i--) {
+  for (int i = 4; i >= 0; i--) {
     SCOPED_TRACE("i=" + std::to_string(i));
     std::optional<int> value = stack.pop();
     ASSERT_TRUE(value.has_value());
@@ -41,4 +41,3 @@ TEST(Stack, PushABunchThenPopThen) {
 }
 
 }  // namespace
-
