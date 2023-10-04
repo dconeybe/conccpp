@@ -1,4 +1,4 @@
 #!/bin/sh
 
-set -v
-exec podman run --rm -v $PWD:/src concpp_python python scripts/pyformat.py "$@"
+set -x
+exec podman run --rm --mount "type=bind,src=$PWD,dst=/src" concpp_python python scripts/pyformat.py "$@"
