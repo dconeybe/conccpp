@@ -32,10 +32,9 @@ RUN apk add --no-cache libstdc++
 RUN pip install --no-cache-dir absl-py pyink pyflakes
 
 # Install bash, for running shell scripts.
-RUN apk add --no-cache bash
-
 # Install cmake, which is required when running some unit tests.
-RUN apk add --no-cache cmake
+# Install git, which is used to determine ignored files.
+RUN apk add --no-cache bash cmake git
 
 # Set /src as the current working directory.
 # When the image is used, the root directory for this Git repository needs to be
