@@ -65,11 +65,18 @@ def git_ignored_files_removed(paths: Sequence[pathlib.Path]) -> list[pathlib.Pat
   args.extend(path_strings)
 
   with tempfile.TemporaryFile() as output_file:
-    completed_process = subprocess.run(args, stdout=output_file)
-    if completed_process.returncode != 0:
-      raise Exception("git check-ignore failed with non-zero exit code")
-    output_file.seek(0)
-    output = output_file.read()
+    completed_process = subprocess.run(args)
+
+    match exit_code := completed_process.returncode:
+      case 1:
+        # Note: `git check-ignore` completes with an exit code of 1 when _none_ of the given files
+        # were ignored.
+        return paths
+      case 0:
+        output_file.seek(0)
+        output = output_file.read()
+      case _:
+        raise Exception(f"git check-ignore failed with non-zero exit code: {exit_code}")
 
   lines = output.decode("utf8", errors="ignore").splitlines()
   ignored_path_strings = frozenset(line.strip() for line in lines)
