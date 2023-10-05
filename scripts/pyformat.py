@@ -14,6 +14,8 @@ from absl import app
 from absl import flags
 from absl import logging
 
+from . import python_sources
+
 
 FLAG_CHECK_ONLY = flags.DEFINE_boolean(
     "check",
@@ -26,9 +28,11 @@ FLAG_CHECK_ONLY = flags.DEFINE_boolean(
 
 
 def main(args: Sequence[str]) -> None:
-  cwd = pathlib.Path.cwd()
-  paths = [path.relative_to(cwd) for path in cwd.glob("**/*.py") if path.is_file()]
-  paths = git_ignored_files_removed(paths)
+  if len(args) > 1:
+    print(f"ERROR: unexpected argument: {args[1]}", file=sys.stderr)
+    return 2
+
+  paths = python_sources.find_python_sources()
 
   pyink_args = [
       "pyink",
@@ -49,45 +53,6 @@ def main(args: Sequence[str]) -> None:
   print(subprocess.list2cmdline(pyink_args))
   completed_process = subprocess.run(pyink_args)
   return completed_process.returncode
-
-
-def git_ignored_files_removed(paths: Sequence[pathlib.Path]) -> list[pathlib.Path]:
-  def path_str_from_path(path: pathlib.Path) -> str:
-    cwd = pathlib.Path.cwd()
-    resolved_path = path.resolve(strict=False)
-    path_string1 = str(resolved_path)
-    path_string2 = str(resolved_path.relative_to(cwd))
-    return path_string1 if len(path_string1) <= len(path_string2) else path_string2
-
-  path_strings = [path_str_from_path(path) for path in paths]
-
-  args = ["git", "check-ignore"]
-  args.extend(path_strings)
-
-  with tempfile.TemporaryFile() as output_file:
-    completed_process = subprocess.run(args, stdout=output_file)
-
-    match exit_code := completed_process.returncode:
-      case 1:
-        # Note: `git check-ignore` completes with an exit code of 1 when _none_ of the given files
-        # were ignored.
-        return paths
-      case 0:
-        output_file.seek(0)
-        output = output_file.read()
-      case _:
-        raise Exception(f"git check-ignore failed with non-zero exit code: {exit_code}")
-
-  lines = output.decode("utf8", errors="ignore").splitlines()
-  ignored_path_strings = frozenset(line.strip() for line in lines)
-
-  unignored_files: list[pathlib.Path] = []
-  for i in range(len(paths)):
-    path_string = path_strings[i]
-    if path_string not in ignored_path_strings:
-      unignored_files.append(paths[i])
-
-  return unignored_files
 
 
 if __name__ == "__main__":
