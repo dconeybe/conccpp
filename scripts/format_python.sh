@@ -1,13 +1,6 @@
 #!/bin/sh
 
-readonly workdir="$(readlink -f "$(dirname "$0")")/.."
-
 exec \
-  podman \
-  run \
-  --rm \
-  --mount "type=bind,src=$workdir,dst=$workdir" \
-  --workdir "$workdir" \
-  docker.io/lakeoak/conccpp_python:2 \
-  python -m scripts.format_python \
+  "$(dirname "$0")/run_python_script_in_container.sh" \
+  "format_python" \
   "$@"
