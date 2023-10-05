@@ -3,13 +3,13 @@ import subprocess
 import tempfile
 
 
-def find_python_sources() -> list[pathlib.Path]:
+def find_sources(file_name_suffix: str) -> list[pathlib.Path]:
   cwd = pathlib.Path.cwd()
   expected_cwd = pathlib.Path(__file__).parent.parent
   if not cwd.samefile(expected_cwd):
     raise UnexpectedCurrentDirectory(f"current directory is {cwd}, but expected {expected_cwd}")
 
-  paths = [path.relative_to(cwd) for path in cwd.glob("**/*.py") if path.is_file()]
+  paths = [path.relative_to(cwd) for path in cwd.glob(f"**/{file_name_suffix}") if path.is_file()]
   path_strings = [str(path) for path in paths]
 
   args = ["git", "check-ignore"]

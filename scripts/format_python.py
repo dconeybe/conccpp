@@ -12,7 +12,7 @@ from absl import app
 from absl import flags
 from absl import logging
 
-from . import python_sources
+from . import source_file_finder
 
 
 FLAG_CHECK_ONLY = flags.DEFINE_boolean(
@@ -30,7 +30,7 @@ def main(args: Sequence[str]) -> None:
     print(f"ERROR: unexpected argument: {args[1]}", file=sys.stderr)
     return 2
 
-  paths = python_sources.find_python_sources()
+  paths = source_file_finder.find_sources("*.py")
 
   pyink_args = [
       "pyink",
