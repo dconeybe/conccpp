@@ -35,8 +35,3 @@ RUN pip install --no-cache-dir absl-py pyink pyflakes
 # Install cmake, which is required when running some unit tests.
 # Install git, which is used to determine ignored files.
 RUN apk add --no-cache bash cmake git
-
-# Set /src as the current working directory.
-# When the image is used, the root directory for this Git repository needs to be
-# bind-mounted at this location.
-WORKDIR /src

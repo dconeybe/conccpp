@@ -65,7 +65,7 @@ def git_ignored_files_removed(paths: Sequence[pathlib.Path]) -> list[pathlib.Pat
   args.extend(path_strings)
 
   with tempfile.TemporaryFile() as output_file:
-    completed_process = subprocess.run(args)
+    completed_process = subprocess.run(args, stdout=output_file)
 
     match exit_code := completed_process.returncode:
       case 1:
