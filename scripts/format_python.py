@@ -5,10 +5,8 @@ Syntax: %s [flags]
 """
 
 from collections.abc import Sequence
-import pathlib
 import subprocess
 import sys
-import tempfile
 
 from absl import app
 from absl import flags
@@ -50,7 +48,7 @@ def main(args: Sequence[str]) -> None:
 
   pyink_args.extend(str(path) for path in paths)
 
-  print(subprocess.list2cmdline(pyink_args))
+  logging.debug(subprocess.list2cmdline(pyink_args))
   completed_process = subprocess.run(pyink_args)
   return completed_process.returncode
 
