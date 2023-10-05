@@ -18,6 +18,7 @@ def main(args: Sequence[str]) -> None:
   if len(args) > 1:
     print(f"ERROR: unexpected argument: {args[1]}", file=sys.stderr)
     return 2
+  del args
 
   paths = source_file_finder.find_sources("*.py")
 
