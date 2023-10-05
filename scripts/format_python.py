@@ -25,7 +25,7 @@ FLAG_CHECK_ONLY = flags.DEFINE_boolean(
 )
 
 
-def main(args: Sequence[str]) -> None:
+def main(args: Sequence[str]) -> int:
   if len(args) > 1:
     print(f"ERROR: unexpected argument: {args[1]}", file=sys.stderr)
     return 2

@@ -14,7 +14,7 @@ from absl import logging
 from . import source_file_finder
 
 
-def main(args: Sequence[str]) -> None:
+def main(args: Sequence[str]) -> int:
   if len(args) > 1:
     print(f"ERROR: unexpected argument: {args[1]}", file=sys.stderr)
     return 2
